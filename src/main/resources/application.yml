@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: jinx
+
+logging:
+  level:
+    root: INFO
+    uz.sardorbroo.jinx: DEBUG

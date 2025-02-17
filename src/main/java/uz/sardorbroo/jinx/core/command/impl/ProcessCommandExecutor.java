@@ -1,54 +1,71 @@
 package uz.sardorbroo.jinx.core.command.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import uz.sardorbroo.jinx.core.command.CommandExecutor;
-import uz.sardorbroo.jinx.enumeration.Command;
 import uz.sardorbroo.jinx.pojo.CommandResult;
-import uz.sardorbroo.jinx.pojo.Flag;
 import uz.sardorbroo.jinx.pojo.Result;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service
 public class ProcessCommandExecutor implements CommandExecutor {
 
     @Override
-    public Result execute(Command command) {
+    public Result execute(String... commands) {
+        log.debug("Executing command. Commands: {}", commands);
 
-        ProcessBuilder builder = new ProcessBuilder("docker");
+        if (Objects.isNull(commands) || commands.length == 0) {
+            log.warn("Invalid argument has passed! Command must not be null!");
+            throw new IllegalArgumentException("Invalid argument has passed! Command must not be null!");
+        }
+
+        ProcessBuilder builder = new ProcessBuilder(commands);
         builder.redirectErrorStream(true);
 
         Process process;
         try {
             process = builder.start();
         } catch (IOException e) {
+            log.error("Error while executing command!. Commands: {} | Exception message: {}", commands, e.getMessage());
+            log.debug("Stack trace: ", e);
             throw new RuntimeException(e);
         }
 
         var is = process.getInputStream();
+        CommandResult r = null;
+        String commandAsSingle = commandAsSingle(commands);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
 
             String result = reader.lines().collect(Collectors.joining());
 
-            CommandResult r = new CommandResult();
-            r.setCommand(command.getName());
+            r = new CommandResult();
+            r.setCommand(commandAsSingle);
             r.setResult(result);
             r.setSuccess(true);
 
-            System.out.println(result);
-            return r;
         } catch (Exception e) {
+            log.error("Error while executing command! Exception: {}", e.getMessage());
+            log.debug("Stack trace: ", e);
+
+            r = new CommandResult();
+            r.setCommand(commandAsSingle);
+            r.setResult(e.getMessage());
+            r.setSuccess(Boolean.FALSE);
 
         }
 
-        return null;
+        log.debug("Command has executed. Result: {}", r);
+        return r;
     }
 
-    @Override
-    public Result execute(Command command, Flag flag) {
-        return null;
+    private String commandAsSingle(String... commands) {
+        return String.join(" ", commands);
     }
+
 }

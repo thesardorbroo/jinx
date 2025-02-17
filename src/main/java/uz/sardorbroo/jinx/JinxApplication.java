@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JinxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(JinxApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(JinxApplication.class, args);
+    }
 
 }

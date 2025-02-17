@@ -1,28 +1,67 @@
 package uz.sardorbroo.jinx.web.rest;
 
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uz.sardorbroo.jinx.core.command.CommandExecutor;
-import uz.sardorbroo.jinx.core.command.impl.ProcessCommandExecutor;
-import uz.sardorbroo.jinx.enumeration.Command;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import uz.sardorbroo.jinx.core.command.NginxCommandExecutor;
+import uz.sardorbroo.jinx.core.command.enumeration.NginxSignal;
 import uz.sardorbroo.jinx.pojo.Result;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/nginx")
 public class NginxResource {
 
+    private final NginxCommandExecutor nginx;
+
+    @SneakyThrows
+    @GetMapping("/help")
+    public ResponseEntity<?> help() {
+        log.info("Get Nginx instruction");
+        Result result = nginx.help();
+        return ResponseEntity.ok(result);
+    }
+
     @SneakyThrows
     @GetMapping("/version")
-    public void getVersion(HttpServletResponse response) {
+    public ResponseEntity<?> getVersion() {
         log.info("Get Nginx version");
-//        CommandExecutor executor = new ApacheCommandExecutor(System.in, response.getOutputStream(), response.getOutputStream());
-        CommandExecutor executor = new ProcessCommandExecutor();
-        Result result = executor.execute(Command.NGINX);
-        response.getOutputStream().print(result.toString());
+        Result result = nginx.getVersion();
+        return ResponseEntity.ok(result);
+    }
+
+    @SneakyThrows
+    @GetMapping("/version/more")
+    public ResponseEntity<?> getVersionAndMore() {
+        log.info("Get Nginx version and more");
+        Result result = nginx.getVersionAndMore();
+        return ResponseEntity.ok(result);
+    }
+
+    @SneakyThrows
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        log.info("Test Nginx configuration");
+        Result result = nginx.test();
+        return ResponseEntity.ok(result);
+    }
+
+    @SneakyThrows
+    @GetMapping("/test/more")
+    public ResponseEntity<?> testAndMore() {
+        log.info("Test Nginx configuration and more");
+        Result result = nginx.testAndMore();
+        return ResponseEntity.ok(result);
+    }
+
+    @SneakyThrows
+    @PostMapping("/signal")
+    public ResponseEntity<?> signal(@RequestParam("signal")NginxSignal signal) {
+        log.info("Send Nginx signal");
+        Result result = nginx.signal(signal);
+        return ResponseEntity.ok(result);
     }
 }
