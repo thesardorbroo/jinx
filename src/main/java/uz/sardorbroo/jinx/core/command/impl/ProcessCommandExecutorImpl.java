@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ProcessCommandExecutor implements CommandExecutor {
+public class ProcessCommandExecutorImpl implements CommandExecutor {
 
     @Override
     public Result execute(String... commands) {
