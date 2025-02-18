@@ -18,7 +18,7 @@ public class PackageNode {
 
     private boolean isDirectory = true;
 
-    private int size;
+    private long size;
 
     private Collection<String> childrenNames = new HashSet<>();
 
