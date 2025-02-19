@@ -1,24 +1,25 @@
 package uz.sardorbroo.jinx.core.command.impl;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import uz.sardorbroo.jinx.core.command.CommandExecutor;
 import uz.sardorbroo.jinx.core.command.NginxCommandExecutor;
 import uz.sardorbroo.jinx.core.command.enumeration.NginxSignal;
+import uz.sardorbroo.jinx.core.file.NginxScanner;
 import uz.sardorbroo.jinx.pojo.Result;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class NginxCommandExecutorImpl implements NginxCommandExecutor {
-
-    // todo get absolute path with PackageScanner/NginxExeFinder
-    private static final String COMMAND = "D:/Programs/Nginx/nginx-1.27.4/nginx";
 
     private static final Option HELP = initHelpOption();
     private static final Option VERSION = initVersionOption();
@@ -30,11 +31,20 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
 
     private final CommandExecutor executor;
 
+    private String command;
+
+    public NginxCommandExecutorImpl(NginxScanner scanner,
+                                    CommandExecutor executor) {
+        this.executor = executor;
+        this.command = scanner.getNginxDetails().getExe();
+    }
+
+
     @Override
     public Result help() {
         log.info("Get instruction about how to use Nginx");
 
-        String[] commands = buildCommands(COMMAND, HELP);
+        String[] commands = buildCommands(this.command, HELP);
 
         Result result = executor.execute(commands);
 
@@ -46,7 +56,7 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
     public Result getVersion() {
         log.info("Get version of Nginx");
 
-        String[] commands = buildCommands(COMMAND, VERSION);
+        String[] commands = buildCommands(this.command, VERSION);
 
         Result result = executor.execute(commands);
 
@@ -58,7 +68,7 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
     public Result getVersionAndMore() {
         log.info("Get version and more of Nginx");
 
-        String[] commands = buildCommands(COMMAND, VERSION_AND_MORE);
+        String[] commands = buildCommands(this.command, VERSION_AND_MORE);
 
         Result result = executor.execute(commands);
 
@@ -70,7 +80,7 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
     public Result test() {
         log.info("Get test of Nginx");
 
-        String[] commands = buildCommands(COMMAND, TEST);
+        String[] commands = buildCommands(this.command, TEST);
 
         Result result = executor.execute(commands);
 
@@ -82,7 +92,7 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
     public Result testAndMore() {
         log.info("Get test and more of Nginx");
 
-        String[] commands = buildCommands(COMMAND, TEST_AND_MORE);
+        String[] commands = buildCommands(this.command, TEST_AND_MORE);
 
         Result result = executor.execute(commands);
 
@@ -106,7 +116,7 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
 
         Option<NginxSignal> signalOption = SIGNALS_MAP.get(signal);
 
-        String[] commands = buildCommands(COMMAND, signalOption);
+        String[] commands = buildCommands(this.command, signalOption);
 
         Result result = executor.execute(commands);
 
@@ -116,6 +126,7 @@ public class NginxCommandExecutorImpl implements NginxCommandExecutor {
 
     private <T> String[] buildCommands(String root, Option<T>... options) {
         log.info("Build single command for execute");
+        log.info("Root command: {} | Options: {}", root, Arrays.toString(options));
 
         if (StringUtils.isEmpty(root)) {
             log.warn("Invalid argument has passed! Root command must not be null!");

@@ -1,6 +1,7 @@
 package uz.sardorbroo.jinx.core.file.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uz.sardorbroo.jinx.core.file.PackageScanner;
 import uz.sardorbroo.jinx.core.file.pojo.PackageNode;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
+@Component
 public class TreePackageScannerImpl implements PackageScanner {
 
     @Override
@@ -21,19 +23,28 @@ public class TreePackageScannerImpl implements PackageScanner {
             throw new IllegalArgumentException("Invalid argument has passed! Path must not be empty!");
         }
 
-        File root = new File(path);
-        if (!root.exists()) {
+        File pathAsfile = new File(path);
+        if (!pathAsfile.exists()) {
             log.warn("Invalid argument has passed! Path must be exist!");
             throw new IllegalArgumentException("Invalid argument has passed! Path must be exist!");
         }
 
-        PackageNode r = convert(root); // doesn't scan if path is specific file
-        if (root.isDirectory()) {
-            tree(root, r);
+        if (pathAsfile.isFile()) {
+            log.info("Given path is belong to specific file. Path: {}", path);
+
+            String parentPath = pathAsfile.getParent();
+            log.info("Scans parent of path. Parent path: {}", parentPath);
+
+            return scan(parentPath);
+        }
+
+        PackageNode root = convert(pathAsfile);
+        if (pathAsfile.isDirectory()) {
+            tree(pathAsfile, root);
         }
 
         log.info("Path has scanned. Path: {}", path);
-        return r;
+        return root;
     }
 
     private void tree(File root, PackageNode node) {

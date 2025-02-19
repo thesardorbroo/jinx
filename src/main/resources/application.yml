@@ -6,3 +6,6 @@ logging:
   level:
     root: INFO
     uz.sardorbroo.jinx: DEBUG
+
+nginx:
+  home: ${NGINX_HOME}

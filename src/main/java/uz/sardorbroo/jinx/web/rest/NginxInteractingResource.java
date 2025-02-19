@@ -13,7 +13,7 @@ import uz.sardorbroo.jinx.pojo.Result;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/nginx")
-public class NginxResource {
+public class NginxInteractingResource {
 
     private final NginxCommandExecutor nginx;
 
