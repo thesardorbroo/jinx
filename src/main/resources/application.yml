@@ -2,6 +2,9 @@ spring:
   application:
     name: jinx
 
+server:
+  port: 8080
+
 logging:
   level:
     root: INFO
