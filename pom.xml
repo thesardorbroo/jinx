@@ -25,9 +25,21 @@
 		<lombok.version>1.18.24</lombok.version>
 		<apache-commons-exec.version>1.3</apache-commons-exec.version>
 		<commons-io.version>2.18.0</commons-io.version>
+		<spring-boot-starter-mongodb.version>3.4.1</spring-boot-starter-mongodb.version>
+		<mongodb-java-driver.version>3.12.14</mongodb-java-driver.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+			<version>${spring-boot-starter-mongodb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>${mongodb-java-driver.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
