@@ -1,0 +1,12 @@
+version: '3.8'
+name: jinx
+
+services:
+  mongodb:
+    container_name: mongodb
+    image: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - 27017:27017

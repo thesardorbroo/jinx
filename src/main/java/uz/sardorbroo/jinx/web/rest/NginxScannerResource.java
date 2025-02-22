@@ -1,9 +1,11 @@
 package uz.sardorbroo.jinx.web.rest;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.sardorbroo.jinx.config.properties.ApplicationProperties;
 import uz.sardorbroo.jinx.core.file.NginxScanner;
 import uz.sardorbroo.jinx.core.file.pojo.NginxDetails;
 import uz.sardorbroo.jinx.utils.ResponseUtils;
@@ -16,7 +18,13 @@ import java.util.Optional;
 @RequestMapping("/api/nginx")
 public class NginxScannerResource {
 
+    private final ApplicationProperties properties;
     private final NginxScanner scanner;
+
+    @PostConstruct
+    public void init() {
+        System.out.println(properties);
+    }
 
     @GetMapping
     public ResponseEntity<NginxDetails> getNginxDetails() {

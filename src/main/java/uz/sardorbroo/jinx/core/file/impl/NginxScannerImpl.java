@@ -1,6 +1,7 @@
 package uz.sardorbroo.jinx.core.file.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import uz.sardorbroo.jinx.config.properties.NginxProperties;
@@ -13,8 +14,12 @@ import uz.sardorbroo.jinx.core.file.pojo.PackageNode;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uz.sardorbroo.jinx.constans.ApplicationConstants.APPLICATION_FEATURES_PROPERTIES;
+import static uz.sardorbroo.jinx.constans.ApplicationConstants.PACKAGE_SCAN_PROPERTIES;
+
 @Slf4j
 @Service
+@ConditionalOnProperty(prefix = APPLICATION_FEATURES_PROPERTIES, name = PACKAGE_SCAN_PROPERTIES, havingValue = "true", matchIfMissing = true)
 public class NginxScannerImpl implements NginxScanner {
 
     private final NginxProperties properties;
