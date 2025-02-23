@@ -14,8 +14,8 @@ spring:
     name: jinx
   data:
     mongodb:
-      uri: mongodb://admin:admin@localhost:27017/jinx
+      uri: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
 
 application:
   features:
-    package-scan: false
+    package-scan: true
