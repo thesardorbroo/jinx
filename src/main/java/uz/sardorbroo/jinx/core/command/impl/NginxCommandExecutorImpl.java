@@ -21,6 +21,13 @@ import java.util.Objects;
 @Service
 public class NginxCommandExecutorImpl implements NginxCommandExecutor {
 
+    // todo get absolute path with PackageScanner/NginxExeFinder
+    // For Windows
+    // private static final String COMMAND = "D:/Programs/Nginx/nginx-1.27.4/nginx";
+
+    // For Linux
+    private static final String COMMAND = "/etc/nginx";
+
     private static final Option HELP = initHelpOption();
     private static final Option VERSION = initVersionOption();
     private static final Option TEST_AND_MORE = initTestAndMore();

@@ -1,14 +1,21 @@
-spring:
-  application:
-    name: jinx
-
-server:
-  port: 8080
-
 logging:
   level:
     root: INFO
     uz.sardorbroo.jinx: DEBUG
 
+server:
+  port: 8080
+
 nginx:
   home: ${NGINX_HOME}
+
+spring:
+  application:
+    name: jinx
+  data:
+    mongodb:
+      uri: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
+
+application:
+  features:
+    package-scan: true
