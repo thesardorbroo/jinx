@@ -3,7 +3,7 @@ package uz.sardorbroo.jinx.core.service.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
-import uz.sardorbroo.jinx.domain.NginxConf;
+import uz.sardorbroo.jinx.core.service.domain.NginxConf;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package uz.sardorbroo.jinx.domain;
+package uz.sardorbroo.jinx.core.service.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,6 +27,7 @@ public class NginxConf {
      */
     private String path;
 
+    // todo relation to Block entities
     /**
      * Content of nginx config file.
      * Content of file stores here.

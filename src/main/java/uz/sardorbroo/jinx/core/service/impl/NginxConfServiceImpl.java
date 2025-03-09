@@ -8,7 +8,7 @@ import uz.sardorbroo.jinx.core.service.NginxConfService;
 import uz.sardorbroo.jinx.core.service.dto.NginxConfDto;
 import uz.sardorbroo.jinx.core.service.mapper.NginxConfMapper;
 import uz.sardorbroo.jinx.core.service.repository.NginxConfRepository;
-import uz.sardorbroo.jinx.domain.NginxConf;
+import uz.sardorbroo.jinx.core.service.domain.NginxConf;
 
 import java.util.List;
 import java.util.Objects;
