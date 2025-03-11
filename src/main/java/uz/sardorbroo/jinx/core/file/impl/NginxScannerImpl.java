@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import uz.sardorbroo.jinx.config.properties.NginxProperties;
 import uz.sardorbroo.jinx.constans.NginxConstants;
+import uz.sardorbroo.jinx.core.file.ConfReader;
 import uz.sardorbroo.jinx.core.file.NginxScanner;
 import uz.sardorbroo.jinx.core.file.PackageScanner;
 import uz.sardorbroo.jinx.core.file.pojo.NginxDetails;
@@ -24,11 +25,13 @@ public class NginxScannerImpl implements NginxScanner {
 
     private final NginxProperties properties;
     private final PackageScanner scanner;
+    private final ConfReader reader;
 
     private NginxDetails nginx;
 
     public NginxScannerImpl(NginxProperties properties,
-                            PackageScanner scanner) {
+                            PackageScanner scanner,
+                            ConfReader reader) {
         this.properties = properties;
         this.scanner = scanner;
 
@@ -37,6 +40,13 @@ public class NginxScannerImpl implements NginxScanner {
                     log.error("Nginx has not found! Path: {}", properties.getHome());
                     return new RuntimeException("Nginx has not found! Path: " + properties.getHome());
                 });
+        this.reader = reader;
+
+        var main = reader.read("/conf/nginx.conf/"); // todo move it to another place
+        System.out.println("Main: ");
+        System.out.println(main);
+        System.out.println("Directives of main: ");
+        main.getDirectives().forEach(System.out::println);
     }
 
     @Override
