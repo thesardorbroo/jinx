@@ -15,5 +15,4 @@ public interface NginxScanner {
     Optional<NginxDetails> find();
 
     Optional<NginxDetails> find(String path);
-
 }

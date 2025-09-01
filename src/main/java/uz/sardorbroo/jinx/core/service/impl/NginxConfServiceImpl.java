@@ -2,17 +2,18 @@ package uz.sardorbroo.jinx.core.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import uz.sardorbroo.jinx.core.file.pojo.DirectoryNode;
+import uz.sardorbroo.jinx.core.file.pojo.FileNode;
+import uz.sardorbroo.jinx.core.file.pojo.PackageNode;
 import uz.sardorbroo.jinx.core.service.NginxConfService;
+import uz.sardorbroo.jinx.core.service.domain.NginxConf;
 import uz.sardorbroo.jinx.core.service.dto.NginxConfDto;
 import uz.sardorbroo.jinx.core.service.mapper.NginxConfMapper;
 import uz.sardorbroo.jinx.core.service.repository.NginxConfRepository;
-import uz.sardorbroo.jinx.core.service.domain.NginxConf;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,6 +23,55 @@ public class NginxConfServiceImpl implements NginxConfService {
 
     private final NginxConfRepository repository;
     private final NginxConfMapper mapper;
+
+    @Override
+    public List<NginxConfDto> save(PackageNode node) {
+        log.info("Save Nginx configurations. PackageNode: {}", node);
+
+        if (Objects.isNull(node)) {
+            log.warn("Invalid argument has passed! Nginx configuration (PackageNode) must not be null!");
+            return Collections.emptyList();
+        }
+
+        List<NginxConfDto> configs = new ArrayList<>();
+        save(node, configs);
+
+        log.info("Nginx configurations are saved successfully. Saved Nginx configurations count: {}", configs.size());
+        return configs;
+    }
+
+    private void save(PackageNode node, List<NginxConfDto> configs) {
+        log.info("Save all Nginx configurations which is located in dir. PackageNode: {} | Configs count: {}", node, configs.size());
+
+        if (node instanceof DirectoryNode dir) {
+
+            for (PackageNode child : dir.getChildren()) {
+                save(child, configs);
+            }
+
+        } else if (node instanceof FileNode file && file.isConf()) {
+
+            NginxConfDto config = mapper.toDto(file);
+            Optional<NginxConfDto> configOpt = getByName(config.getName());
+            configOpt.ifPresentOrElse(conf -> {
+
+                // updates existed config file
+                Optional<NginxConfDto> updatedConfOpt = update(conf);
+                configs.add(updatedConfOpt.orElse(null));
+            }, () -> {
+
+                // saves new config file
+                Optional<NginxConfDto> savedConfOpt = save(config);
+                configs.add(savedConfOpt.orElse(null));
+            });
+
+            if (configOpt.isEmpty()) {
+                log.warn("Something went wrong while saving Nginx configuration! FileNode: {}", file);
+            }
+
+            configs.add(config);
+        }
+    }
 
     @Override
     public Optional<NginxConfDto> save(NginxConfDto conf) {
@@ -76,6 +126,22 @@ public class NginxConfServiceImpl implements NginxConfService {
 
         log.info("Nginx configs are fetched successfully. Nginx configs count: {}", configs.size());
         return configs;
+    }
+
+    @Override
+    public Optional<NginxConfDto> getByName(String name) {
+        log.info("Get Nginx configuration by name. Name: {}", name);
+
+        if (StringUtils.isBlank(name)) {
+            log.warn("Invalid argument has passed! Nginx configuration name must not be null!");
+            return Optional.empty();
+        }
+
+        Optional<NginxConfDto> configOpt = repository.findByName(name)
+                .map(mapper::toDto);
+
+        log.info("Has Nginx configuration found by name? Result: {}", configOpt);
+        return configOpt;
     }
 
     @Override

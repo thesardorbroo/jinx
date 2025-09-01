@@ -6,11 +6,12 @@ import org.springframework.stereotype.Repository;
 import uz.sardorbroo.jinx.core.service.domain.NginxConf;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NginxConfRepository extends MongoRepository<NginxConf, String> {
 
-    List<NginxConf> findByName(String name);
+    Optional<NginxConf> findByName(String name);
 
     @Query("{name:  '?0'}")
     List<NginxConf> findByNameWithQuery(String name);
