@@ -12,10 +12,10 @@ nginx:
 spring:
   application:
     name: jinx
-#  Uncomment if you want to enable MongoDB in your project
-#  data:
-#    mongodb:
-#      uri: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
+  # Uncomment if you want to enable MongoDB in your project
+  data:
+    mongodb:
+      uri: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
 
 application:
   features:

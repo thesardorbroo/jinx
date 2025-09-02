@@ -56,7 +56,8 @@ public class NginxConfServiceImpl implements NginxConfService {
             configOpt.ifPresentOrElse(conf -> {
 
                 // updates existed config file
-                Optional<NginxConfDto> updatedConfOpt = update(conf);
+                config.setId(conf.getId());
+                Optional<NginxConfDto> updatedConfOpt = update(config);
                 configs.add(updatedConfOpt.orElse(null));
             }, () -> {
 

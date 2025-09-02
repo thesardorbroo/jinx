@@ -28,14 +28,12 @@ public class NginxScannerImpl implements NginxScanner {
     private final NginxProperties properties;
     private final PackageScanner scanner;
     private final NginxConfService confService;
-    private final ConfReader reader;
 
     private NginxDetails nginx;
 
     public NginxScannerImpl(NginxProperties properties,
-                            PackageScanner scanner, NginxConfService confService) {
                             PackageScanner scanner,
-                            ConfReader reader) {
+                            NginxConfService confService) {
         this.properties = properties;
         this.scanner = scanner;
         this.confService = confService;
@@ -46,7 +44,7 @@ public class NginxScannerImpl implements NginxScanner {
                     return new RuntimeException("Nginx has not found! Path: " + properties.getHome());
                 });
 
-        confService.save(this.nginx.getNode());
+        this.confService.save(this.nginx.getNode());
     }
 
     @Override
@@ -130,5 +128,4 @@ public class NginxScannerImpl implements NginxScanner {
         log.info("Nginx has detected successfully. Nginx details: {}", nginx);
         return Optional.of(nginx);
     }
-
 }

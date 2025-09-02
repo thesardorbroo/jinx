@@ -1,5 +1,6 @@
 package uz.sardorbroo.jinx.core.file.resolver.impl;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.SneakyThrows;
 import uz.sardorbroo.jinx.core.content.ContentLoader;
 import uz.sardorbroo.jinx.core.content.directive.impl.MemoryDirectiveStorage;
@@ -54,7 +55,7 @@ public class SimpleNodeResolver implements NodeResolver {
 
     private class FileConverter implements Converter {
 
-        private final ContentLoader loader = new ConfContentLoader(new MemoryDirectiveStorage());
+        private final ContentLoader loader = new ConfContentLoader(new MemoryDirectiveStorage(), new JsonMapper());
 
         @SneakyThrows
         @Override
@@ -70,7 +71,8 @@ public class SimpleNodeResolver implements NodeResolver {
             type.getSetter().accept(node);
 
             if (Objects.equals(FileType.CONF, type)) {
-                loader.load(new FileInputStream(file));
+                String content = loader.load(new FileInputStream(file));
+                node.setContent(content);
             }
 
             return node;

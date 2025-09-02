@@ -1,5 +1,6 @@
 package uz.sardorbroo.jinx.core.content.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import uz.sardorbroo.jinx.core.content.ContentLoader;
 import uz.sardorbroo.jinx.core.content.directive.DirectiveStorage;
 import uz.sardorbroo.jinx.core.content.pojo.BlockDirective;
-import uz.sardorbroo.jinx.core.content.pojo.Content;
 import uz.sardorbroo.jinx.core.content.pojo.Context;
 import uz.sardorbroo.jinx.core.content.pojo.Directive;
 
@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -25,14 +24,15 @@ import java.util.List;
 public class ConfContentLoader implements ContentLoader {
 
     private final DirectiveStorage storage;
+    private final ObjectMapper mapper;
 
     @Override
     @SneakyThrows
-    public Content load(InputStream is) {
+    public String load(InputStream is) {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         Context main = new Context();
-        main.setName("Main");
+        main.setName("main");
 
         while (reader.ready()) {
 
@@ -40,8 +40,7 @@ public class ConfContentLoader implements ContentLoader {
             main = load(line, main, main);
         }
 
-        System.out.println("Main context: " + main);
-        return null;
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(main);
     }
 
     private Context load(String line, Context context, Context root) {
@@ -54,7 +53,6 @@ public class ConfContentLoader implements ContentLoader {
 
             String optimized = line.trim();
             String[] elements = optimized.split(" ");
-            System.out.println("Optimized: " + optimized + "\tElements: " + Arrays.toString(elements));
             if (elements.length != 0) {
 
                 if (StringUtils.isBlank(elements[0]) || !storage.supported(elements[0])) {

@@ -16,4 +16,6 @@ public class PackageNode {
     private long size;
 
     private String path;
+
+    private String content;
 }
