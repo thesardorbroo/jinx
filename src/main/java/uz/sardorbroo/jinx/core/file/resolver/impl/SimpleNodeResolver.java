@@ -1,5 +1,9 @@
 package uz.sardorbroo.jinx.core.file.resolver.impl;
 
+import lombok.SneakyThrows;
+import uz.sardorbroo.jinx.core.content.ContentLoader;
+import uz.sardorbroo.jinx.core.content.directive.impl.MemoryDirectiveStorage;
+import uz.sardorbroo.jinx.core.content.impl.ConfContentLoader;
 import uz.sardorbroo.jinx.core.file.enumeration.FileType;
 import uz.sardorbroo.jinx.core.file.pojo.DirectoryNode;
 import uz.sardorbroo.jinx.core.file.pojo.FileNode;
@@ -8,6 +12,7 @@ import uz.sardorbroo.jinx.core.file.resolver.FileResolver;
 import uz.sardorbroo.jinx.core.file.resolver.NodeResolver;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Objects;
 
 public class SimpleNodeResolver implements NodeResolver {
@@ -49,6 +54,9 @@ public class SimpleNodeResolver implements NodeResolver {
 
     private class FileConverter implements Converter {
 
+        private final ContentLoader loader = new ConfContentLoader(new MemoryDirectiveStorage());
+
+        @SneakyThrows
         @Override
         public PackageNode convert(File file) {
 
@@ -60,6 +68,10 @@ public class SimpleNodeResolver implements NodeResolver {
 
             FileType type = resolver.resolve(file.getName());
             type.getSetter().accept(node);
+
+            if (Objects.equals(FileType.CONF, type)) {
+                loader.load(new FileInputStream(file));
+            }
 
             return node;
         }
