@@ -59,7 +59,7 @@ public class NginxInteractingResource {
 
     @SneakyThrows
     @PostMapping("/signal")
-    public ResponseEntity<?> signal(@RequestParam("signal")NginxSignal signal) {
+    public ResponseEntity<?> signal(@RequestParam("signal") NginxSignal signal) {
         log.info("Send Nginx signal");
         Result result = nginx.signal(signal);
         return ResponseEntity.ok(result);

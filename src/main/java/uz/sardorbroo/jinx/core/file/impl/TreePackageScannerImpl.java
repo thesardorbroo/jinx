@@ -4,7 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uz.sardorbroo.jinx.core.file.PackageScanner;
+import uz.sardorbroo.jinx.core.file.pojo.DirectoryNode;
 import uz.sardorbroo.jinx.core.file.pojo.PackageNode;
+import uz.sardorbroo.jinx.core.file.resolver.NodeResolver;
+import uz.sardorbroo.jinx.core.file.resolver.impl.SimpleNodeResolver;
 
 import java.io.File;
 import java.util.HashSet;
@@ -13,6 +16,8 @@ import java.util.Set;
 @Slf4j
 @Component
 public class TreePackageScannerImpl implements PackageScanner {
+
+    private final NodeResolver resolver = new SimpleNodeResolver();
 
     @Override
     public PackageNode scan(String path) {
@@ -38,7 +43,7 @@ public class TreePackageScannerImpl implements PackageScanner {
             return scan(parentPath);
         }
 
-        PackageNode root = convert(pathAsfile);
+        PackageNode root = resolver.resolve(pathAsfile);
         if (pathAsfile.isDirectory()) {
             tree(pathAsfile, root);
         }
@@ -54,24 +59,18 @@ public class TreePackageScannerImpl implements PackageScanner {
 
         for (File file : files) {
 
-            PackageNode child = convert(file);
-            if (child.isDirectory()) {
-                tree(file, child);
+            PackageNode child = resolver.resolve(file);
+            if (child instanceof DirectoryNode dir) {
+                if (dir.isDirectory()) {
+                    tree(file, dir);
+                }
             }
             children.add(child);
         }
 
-        node.setChildren(children);
-    }
+        if (node instanceof DirectoryNode dir) {
 
-    private PackageNode convert(File file) {
-
-        var node = new PackageNode();
-
-        node.setName(file.getName());
-        node.setSize(file.length());
-        node.setDirectory(file.isDirectory());
-
-        return node;
+            dir.setChildren(children);
+        }
     }
 }

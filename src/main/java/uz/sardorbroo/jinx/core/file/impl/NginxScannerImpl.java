@@ -9,8 +9,10 @@ import uz.sardorbroo.jinx.constans.NginxConstants;
 import uz.sardorbroo.jinx.core.file.ConfReader;
 import uz.sardorbroo.jinx.core.file.NginxScanner;
 import uz.sardorbroo.jinx.core.file.PackageScanner;
+import uz.sardorbroo.jinx.core.file.pojo.DirectoryNode;
 import uz.sardorbroo.jinx.core.file.pojo.NginxDetails;
 import uz.sardorbroo.jinx.core.file.pojo.PackageNode;
+import uz.sardorbroo.jinx.core.service.NginxConfService;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -25,28 +27,26 @@ public class NginxScannerImpl implements NginxScanner {
 
     private final NginxProperties properties;
     private final PackageScanner scanner;
+    private final NginxConfService confService;
     private final ConfReader reader;
 
     private NginxDetails nginx;
 
     public NginxScannerImpl(NginxProperties properties,
+                            PackageScanner scanner, NginxConfService confService) {
                             PackageScanner scanner,
                             ConfReader reader) {
         this.properties = properties;
         this.scanner = scanner;
+        this.confService = confService;
 
         this.nginx = find()
                 .orElseThrow(() -> {
                     log.error("Nginx has not found! Path: {}", properties.getHome());
                     return new RuntimeException("Nginx has not found! Path: " + properties.getHome());
                 });
-        this.reader = reader;
 
-        var main = reader.read("/conf/nginx.conf/"); // todo move it to another place
-        System.out.println("Main: ");
-        System.out.println(main);
-        System.out.println("Directives of main: ");
-        main.getDirectives().forEach(System.out::println);
+        confService.save(this.nginx.getNode());
     }
 
     @Override
@@ -108,12 +108,18 @@ public class NginxScannerImpl implements NginxScanner {
             return Optional.empty();
         }
 
-        boolean isExeExist = home.getChildrenNames()
-                .stream()
-                .anyMatch(child -> Objects.equals(NginxConstants.NGINX_EXE_NAME, child));
-        if (!isExeExist) {
-            log.warn("Nginx executable file is not exist in path! Path: {}", path);
-            return Optional.empty();
+        if (home instanceof DirectoryNode dir) {
+
+            boolean isExeExist = dir.getChildrenNames()
+                    .stream()
+                    .anyMatch(child -> Objects.equals(NginxConstants.NGINX_EXE_NAME, child));
+            if (!isExeExist) {
+                log.warn("Nginx executable file is not exist in path! Path: {}", path);
+                return Optional.empty();
+            }
+        } else {
+
+            log.warn("Nginx home directory has not found. Path was not directory! Path: {}", path);
         }
 
         NginxDetails nginx = new NginxDetails();

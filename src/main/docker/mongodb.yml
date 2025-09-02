@@ -4,9 +4,20 @@ name: jinx
 services:
   mongodb:
     container_name: mongodb
-    image: mongodb
+    image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
       - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://admin:admin@mongodb:27017/jinx?authSource=admin
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: express-admin
+      ME_CONFIG_BASICAUTH_PASSWORD: express-admin

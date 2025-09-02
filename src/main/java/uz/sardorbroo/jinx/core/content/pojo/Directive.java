@@ -1,19 +1,17 @@
-package uz.sardorbroo.jinx.core.file.pojo;
+package uz.sardorbroo.jinx.core.content.pojo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PackageNode {
+public class Directive {
 
     private String name;
 
-    private long size;
-
-    private String path;
+    private List<String> values;
 }
