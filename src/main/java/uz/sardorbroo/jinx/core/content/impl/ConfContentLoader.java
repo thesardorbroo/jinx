@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,27 +27,32 @@ public class ConfContentLoader implements ContentLoader {
     private final DirectiveStorage storage;
     private final ObjectMapper mapper;
 
+    // contexts
+    private Context previous;
+    private Context current;
+
     @Override
     @SneakyThrows
-    public String load(InputStream is) {
+    public Context load(InputStream is) {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         Context main = new Context();
         main.setName("main");
+        this.current = main;
 
         while (reader.ready()) {
 
             String line = reader.readLine();
-            main = load(line, main, main);
+            load(line);
         }
 
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(main);
+        return main;
     }
 
-    private Context load(String line, Context context, Context root) {
+    private void load(String line) {
 
         if (StringUtils.isBlank(line)) {
-            return context;
+            return;
         }
 
         if (!line.startsWith("#")) { // line is commented
@@ -55,12 +61,17 @@ public class ConfContentLoader implements ContentLoader {
             String[] elements = optimized.split(" ");
             if (elements.length != 0) {
 
-                if (StringUtils.isBlank(elements[0]) || !storage.supported(elements[0])) {
-                    return context;
+                String name = elements[0];
+                if (Objects.equals("}", name)) {
+                    this.current = this.previous;
+                    this.previous = null;
+                }
+
+                if (StringUtils.isBlank(name) || !storage.supported(name)) {
+                    return;
                 }
 
                 Directive directive = new Directive();
-                String name = elements[0];
                 List<String> values = new ArrayList<>();
 
                 for (int i = 1; i < elements.length; i++) {
@@ -70,19 +81,27 @@ public class ConfContentLoader implements ContentLoader {
 
                     if (arg.startsWith("{")) {
 
-                        Context inner = new Context();
-                        inner.setName(name);
-
-                        load("", inner, context);
+                        Context context = new Context();
+                        context.setName(name);
 
                         BlockDirective block = new BlockDirective();
+                        block.setName(name);
                         block.setValues(values);
-                        block.setDirectives(new ArrayList<>());
 
-                        context.setInner(inner);
+                        this.current.addDirective(block);
+                        this.current.addContext(context);
+
+                        this.previous = this.current;
+                        this.current = context;
+
+                        break;
 
                     } else if (arg.endsWith("}")) {
-                        return root;
+
+                        this.current = this.previous;
+                        this.previous = null;
+
+                        // break;
 
                     } else if (arg.endsWith(";")) {
                         arg = arg.substring(0, arg.lastIndexOf(";"));
@@ -94,10 +113,10 @@ public class ConfContentLoader implements ContentLoader {
                 directive.setName(name);
                 directive.setValues(values);
 
-                context.getDirectives().add(directive);
+                if (Objects.nonNull(name)) {
+                    this.current.addDirective(directive);
+                }
             }
         }
-
-        return context;
     }
 }

@@ -1,10 +1,14 @@
 package uz.sardorbroo.jinx.core.content.directive.impl;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uz.sardorbroo.jinx.core.content.directive.DirectiveStorage;
 
+import java.io.*;
 import java.util.*;
 
 @Slf4j
@@ -12,47 +16,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MemoryDirectiveStorage implements DirectiveStorage {
 
-    public static final Map<String, Directive> DIRECTIVES = Map.ofEntries(
-            // --- Core contexts ---
-            Map.entry("main", new Directive("main", true)),
-            Map.entry("events", new Directive("events", true)),
-            Map.entry("http", new Directive("http", true)),
-            Map.entry("server", new Directive("server", true)),
-            Map.entry("location", new Directive("location", true)),
-            Map.entry("upstream", new Directive("upstream", true)),
-
-            // --- HTTP server ---
-            Map.entry("listen", new Directive("listen", false)),
-            Map.entry("server_name", new Directive("server_name", false)),
-            Map.entry("root", new Directive("root", false)),
-            Map.entry("index", new Directive("index", false)),
-            Map.entry("error_page", new Directive("error_page", false)),
-
-            // --- Proxy ---
-            Map.entry("proxy_pass", new Directive("proxy_pass", false)),
-            Map.entry("proxy_set_header", new Directive("proxy_set_header", false)),
-            Map.entry("proxy_redirect", new Directive("proxy_redirect", false)),
-
-            // --- SSL/TLS ---
-            Map.entry("ssl_certificate", new Directive("ssl_certificate", false)),
-            Map.entry("ssl_certificate_key", new Directive("ssl_certificate_key", false)),
-            Map.entry("ssl_protocols", new Directive("ssl_protocols", false)),
-
-            // --- Gzip ---
-            Map.entry("gzip", new Directive("gzip", false)),
-            Map.entry("gzip_types", new Directive("gzip_types", false)),
-
-            // --- Rewrite ---
-            Map.entry("rewrite", new Directive("rewrite", false)),
-            Map.entry("return", new Directive("return", false)),
-
-            // --- Logging ---
-            Map.entry("access_log", new Directive("access_log", false)),
-            Map.entry("error_log", new Directive("error_log", false)),
-
-            // --- Logging ---
-            Map.entry("worker_processes", new Directive("worker_processes", false))
-    );
+    public static final Map<String, Directive> DIRECTIVES = getDirectives();
 
     private static final Collection<String> DIRECTIVES_NAMES
             = Collections.unmodifiableCollection(DIRECTIVES.keySet());
@@ -67,26 +31,56 @@ public class MemoryDirectiveStorage implements DirectiveStorage {
         return DIRECTIVES.containsKey(directive);
     }
 
+    public static Map<String, Directive> getDirectives() {
+
+        Map<String, Directive> directives = new HashMap<>();
+        String path = "src/main/resources/config/db/init-data/nginx_directives_extended.csv";
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+
+            boolean header = true;
+            while (reader.ready()) {
+
+                String line = reader.readLine();
+                if (header) {
+                    header = false;
+                    continue;
+                }
+
+                String[] columns = line.split(",", 6);
+                Directive directive = new Directive();
+                directive.setName(columns[0]);
+                directive.setContexts(columns[1]);
+                directive.setPossibleValues(columns[2]);
+                directive.setRegexSupport(Objects.equals("true", columns[3]));
+                directive.setBlockDirective(Objects.equals("true", columns[4]));
+                directive.setDescription(columns[5]);
+
+                directives.put(directive.getName(), directive);
+            }
+
+            return directives;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Directive {
-        private final String name;
-        private final boolean block;
 
-        public Directive(String name, boolean block) {
-            this.name = name;
-            this.block = block;
-        }
+        private String name;
 
-        public String getName() {
-            return name;
-        }
+        private String contexts;
 
-        public boolean isBlock() {
-            return block;
-        }
+        private String possibleValues;
 
-        @Override
-        public String toString() {
-            return "Directive{name='" + name + "', block=" + block + '}';
-        }
+        private boolean regexSupport;
+
+        private boolean isBlockDirective;
+
+        private String description;
     }
 }

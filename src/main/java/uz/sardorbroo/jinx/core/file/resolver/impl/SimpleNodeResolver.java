@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import uz.sardorbroo.jinx.core.content.ContentLoader;
 import uz.sardorbroo.jinx.core.content.directive.impl.MemoryDirectiveStorage;
 import uz.sardorbroo.jinx.core.content.impl.ConfContentLoader;
+import uz.sardorbroo.jinx.core.content.pojo.Context;
 import uz.sardorbroo.jinx.core.file.enumeration.FileType;
 import uz.sardorbroo.jinx.core.file.pojo.DirectoryNode;
 import uz.sardorbroo.jinx.core.file.pojo.FileNode;
@@ -71,8 +72,8 @@ public class SimpleNodeResolver implements NodeResolver {
             type.getSetter().accept(node);
 
             if (Objects.equals(FileType.CONF, type)) {
-                String content = loader.load(new FileInputStream(file));
-                node.setContent(content);
+                Context context = loader.load(new FileInputStream(file));
+                node.setContext(context);
             }
 
             return node;

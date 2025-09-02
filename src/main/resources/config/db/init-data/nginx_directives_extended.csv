@@ -1,0 +1,279 @@
+name,contexts,possible_values,support_regex,is_block_directive,description
+user,main,<user> [group],false,false,User and optional group for worker processes.
+worker_processes,main,auto | <number>,false,false,Number of worker processes.
+pid,main,<path>,false,false,Path to PID file.
+error_log,"main,http,mail,stream",<path> [level],false,false,Error log file and minimum level (debug|info|notice|warn|error|crit|alert|emerg).
+worker_rlimit_nofile,main,<number>,false,false,Set RLIMIT_NOFILE for worker processes.
+worker_priority,main,<number>,false,false,Set nice priority for worker processes.
+worker_cpu_affinity,main,auto | <mask> ...,false,false,Bind workers to CPU cores using masks.
+daemon,main,on | off,false,false,Run in the background or foreground.
+master_process,main,on | off,false,false,Enable/disable master/worker mode.
+pcre_jit,main,on | off,false,false,Enable JIT for PCRE regex engine.
+include,any,<glob/path>,false,false,Include another config file(s).
+env,main,<name>[=<value>],false,false,Pass environment variables to workers.
+load_module,main,<path to module>,false,false,Dynamically load a module at startup.
+thread_pool,main,<name> threads=<n> [max_queue=<n>],false,false,Configure a named thread pool for AIO.
+events,main,,false,true,Events context block.
+worker_connections,events,<number>,false,false,Maximum simultaneous connections per worker.
+multi_accept,events,on | off,false,false,Accept multiple connections at once.
+accept_mutex,events,on | off,false,false,Serialize accept() to avoid thundering herd.
+accept_mutex_delay,events,<time>,false,false,Delay when waiting for accept mutex.
+use,events,select | poll | kqueue | epoll | /dev/poll | eventport,false,false,Explicitly choose event method.
+http,main,,false,true,HTTP context block.
+server,"http,stream,mail,upstream",,false,true,Server/upstream block (context depends on parent).
+location,server,[=|~|~*|^~] <prefix|regex> { ... },true,true,"Define URI-matching location; supports prefix and regex (~, ~*)."
+types,"http,server,location",{ mime/type ext... } | off,false,true,Map file extensions to MIME types.
+default_type,"http,server,location",<mime/type>,false,false,Default MIME type for responses without type.
+client_max_body_size,"http,server,location",<size>,false,false,Maximum allowed request body size.
+client_body_buffer_size,"http,server,location",<size>,false,false,Buffer size for reading client request body.
+client_body_temp_path,http,<path> [level1 [level2 [level3]]],false,false,Directory for buffering large request bodies.
+sendfile,"http,server,location",on | off,false,false,Enable zero-copy file transmission.
+tcp_nopush,"http,server,location",on | off,false,false,Optimize packetization for sendfile.
+tcp_nodelay,"http,server,location,upstream",on | off,false,false,Disable Nagle’s algorithm on keepalive connections.
+keepalive_timeout,"http,server,location",<timeout> [<header_timeout>],false,false,Idle keepalive connection timeout.
+keepalive_requests,"http,server,location,upstream",<number>,false,false,Max requests per keepalive connection.
+send_timeout,"http,server,location",<time>,false,false,Timeout for sending response to client.
+server_tokens,"http,server",on | off | build | string,false,false,Control Server header and error page version.
+server_name,server,<name> ... | ~<regex>,true,false,Server names; wildcards and regex (~) supported.
+listen,server,[ip]:port [ssl http2 proxy_protocol ...],false,false,Bind address/port and socket options.
+root,"http,server,location",<path>,false,false,Root directory for requests.
+alias,location,<path>,false,false,Map URI to a different filesystem path (location-only).
+index,"http,server,location",<file> ...,false,false,Index file names for directories.
+error_page,"http,server,location",<code> ... <uri>|=@named,false,false,Redirect or handle specific error codes via URI.
+try_files,"server,location",<path> ... =<code>|<uri>,false,false,Check files in order and fallback to URI/code.
+return,"server,location,if,stream",<code> [text] | <code> <url> | <url>,false,false,Immediately return code or redirect (http/stream).
+if,"server,location",<condition> { ... },true,true,"Conditionally process directives; supports regex match (~, ~*)."
+set,"server,location,if,map",$var <value>,false,false,Set a variable to value/expression.
+log_format,http,<name> <format>,false,false,Define named access log format using variables.
+access_log,"http,server,location",off | <path> [format] [buffer=size] [gzip[=level]],false,false,Write request logs to file or disable.
+open_file_cache,"http,server,location",off | max=<n> [inactive=<time>],false,false,Cache open file descriptors and cache entries.
+open_file_cache_valid,"http,server,location",<time>,false,false,How long to consider open_file_cache entries valid.
+open_file_cache_min_uses,"http,server,location",<number>,false,false,Minimum uses before caching a descriptor.
+aio,"http,server,location",on | off | threads[=<pool>],false,false,Enable asynchronous I/O for file reads.
+directio,"http,server,location",on | off | <size>,false,false,Use direct I/O for large files.
+client_header_timeout,"http,server,location",<time>,false,false,Timeout for reading client request headers.
+client_body_timeout,"http,server,location",<time>,false,false,Timeout for reading client request body.
+client_header_buffer_size,"http,server,location",<size>,false,false,Buffer size for initial request line and headers.
+large_client_header_buffers,"http,server,location",<n> <size>,false,false,Number and size of large header buffers.
+ignore_invalid_headers,"http,server,location",on | off,false,false,Ignore non-standard headers in requests.
+merge_slashes,"http,server,location",on | off,false,false,Merge adjacent slashes in URIs.
+underscores_in_headers,"http,server,location",on | off,false,false,Allow/deny underscores in header names.
+variables_hash_bucket_size,http,<size>,false,false,Hash bucket size for variables.
+variables_hash_max_size,http,<size>,false,false,Max hash size for variables.
+send_trailers,"http,server,location",on | off,false,false,Enable HTTP chunked trailers in responses.
+gzip,"http,server,location",on | off,false,false,Enable gzip compression of responses.
+gzip_comp_level,"http,server,location",1..9,false,false,Compression level for gzip.
+gzip_min_length,"http,server,location",<length>,false,false,Minimum response size to compress.
+gzip_types,"http,server,location",mime/type ...,false,false,MIME types to compress (text/html always included).
+gzip_vary,"http,server,location",on | off,false,false,Add 'Vary: Accept-Encoding' header.
+gzip_buffers,"http,server,location",<n> <size>,false,false,Number and size of compression buffers.
+gzip_disable,"http,server,location",msie6 | <regex>,true,false,Disable gzip for matching user agents (regex allowed).
+gzip_http_version,"http,server,location",1.0 | 1.1,false,false,Minimum HTTP version for gzip.
+gzip_proxied,"http,server,location",off | expired | no-cache | no-store | private | ...,false,false,Enable compression for proxied responses meeting conditions.
+gzip_static,"http,server,location",on | off | always,false,false,Serve precompressed *.gz files.
+gunzip,"http,server,location",on | off,false,false,Enable on-the-fly decompression of gzip-encoded responses.
+gunzip_buffers,"http,server,location",<n> <size>,false,false,Number and size of buffers for gunzip.
+rewrite,"server,location,if",<regex> <replacement> [last|break|redirect|permanent],true,false,Rewrite URI using regex and flags.
+break,"server,location,if",,false,false,Stop processing of rewrite directives in current request.
+map,http,$var $source { ... },true,true,Create variable via mapping values/regex from source variables.
+map_hash_bucket_size,http,<size>,false,false,Bucket size for map hash.
+map_hash_max_size,http,<size>,false,false,Max size for map hash.
+split_clients,http,<string> $var { ... },false,true,Distribute values among buckets for A/B testing etc.
+geo,http,$var { ... },true,true,Define variable depending on client IP (supports ranges and default).
+proxy_pass,"location,if in location,limit_except",<scheme>://<upstream>|<unix:> | <uri>,false,false,Define upstream to which requests are proxied.
+proxy_set_header,"http,server,location",<header> <value>,false,false,Set/override header passed to upstream.
+proxy_redirect,"http,server,location",off | default | <from> <to>,false,false,Rewrite 'Location'/'Refresh' headers from upstream.
+proxy_http_version,"http,server,location",1.0 | 1.1,false,false,HTTP version used for proxying.
+proxy_connect_timeout,"http,server,location",<time>,false,false,Timeout for establishing a connection to upstream.
+proxy_send_timeout,"http,server,location",<time>,false,false,Timeout for sending a request to upstream.
+proxy_read_timeout,"http,server,location",<time>,false,false,Timeout for reading a response from upstream.
+proxy_buffering,"http,server,location",on | off,false,false,Enable response buffering from upstream.
+proxy_buffers,"http,server,location",<n> <size>,false,false,Number and size of buffers for a single connection.
+proxy_busy_buffers_size,"http,server,location",<size>,false,false,Size of buffers in busy state.
+proxy_buffer_size,"http,server,location",<size>,false,false,Size of the buffer for the first part of response.
+proxy_request_buffering,"http,server,location",on | off,false,false,Enable buffering of client request body.
+proxy_max_temp_file_size,"http,server,location",<size>|0,false,false,Max size of temporary files when proxy_buffering is on.
+proxy_temp_path,http,<path> [level1 [level2 [level3]]],false,false,Directory for temporary proxy files.
+proxy_cache,"http,server,location",off | <zone>,false,false,Enable named cache zone for proxied responses.
+proxy_cache_path,http,<path> keys_zone=<name>:<size> [inactive=<time>] [levels=...] ...,false,false,Define cache storage and parameters.
+proxy_cache_key,"http,server,location",<string>,false,false,Key used to store cached responses.
+proxy_cache_valid,"http,server,location",<code> <time> | any <time>,false,false,Default cache time by response code.
+proxy_cache_bypass,"http,server,location",<condition> ...,false,false,Conditions to bypass cache (uses variables).
+proxy_no_cache,"http,server,location",<condition> ...,false,false,Conditions that prevent saving to cache.
+proxy_cache_min_uses,"http,server,location",<number>,false,false,Minimum number of uses before caching.
+proxy_cache_lock,"http,server,location",on | off,false,false,Serialize cache updates for same key.
+proxy_cache_use_stale,"http,server,location",error | timeout | http_500 | updating | ...,false,false,Serve stale content on specified problems.
+proxy_next_upstream,"http,server,location",error | timeout | invalid_header | http_500 | ... | off,false,false,Conditions to pass request to next upstream.
+proxy_next_upstream_tries,"http,server,location",<number>,false,false,Limit number of next_upstream attempts.
+proxy_next_upstream_timeout,"http,server,location",<time>,false,false,Limit time for next_upstream attempts.
+proxy_intercept_errors,"http,server,location",on | off,false,false,Allow error_page processing of upstream errors.
+proxy_ssl_server_name,"http,server,location",on | off,false,false,Enable SNI with upstream.
+proxy_ssl_name,"http,server,location",<name>,false,false,Override SNI server name.
+proxy_ssl_verify,"http,server,location",on | off,false,false,Verify upstream HTTPS certificate.
+proxy_ssl_verify_depth,"http,server,location",<number>,false,false,Verification depth for upstream HTTPS.
+proxy_ssl_trusted_certificate,"http,server,location",<path>,false,false,CA bundle for verifying upstream.
+proxy_ssl_protocols,"http,server,location",TLSv1 TLSv1.1 TLSv1.2 TLSv1.3 ...,false,false,Allowed TLS protocol versions to upstream.
+proxy_ssl_ciphers,"http,server,location",<ciphers>,false,false,Cipher suites for upstream TLS.
+proxy_headers_hash_bucket_size,http,<size>,false,false,Hash bucket size for proxy headers.
+proxy_headers_hash_max_size,http,<size>,false,false,Max hash size for proxy headers.
+upstream,"http,stream",<name> { ... },false,true,Define a named upstream group.
+server,upstream,<address> [parameters],false,false,"Add server to upstream with weight, max_fails, fail_timeout, etc."
+zone,upstream,<name> <size>,false,false,Share upstream state among workers.
+hash,upstream,<key> [consistent],false,false,Enable hash load balancing.
+least_conn,upstream,,false,false,Enable least connections load balancing.
+random,upstream,[two] [least_conn],false,false,Enable random load balancing mode.
+keepalive,upstream,<connections>,false,false,Enable connection caching to upstream.
+keepalive_time,upstream,<time>,false,false,Max time an idle keepalive connection stays open.
+keepalive_requests,upstream,<number>,false,false,Max requests per keepalive connection to upstream.
+keepalive_timeout,upstream,<time>,false,false,Idle timeout for upstream keepalive.
+limit_req_zone,http,$key zone=<name>:<size> rate=<rate>,false,false,Define shared memory zone and rate for requests.
+limit_req,"http,server,location",zone=<name> [burst=<n>] [nodelay],false,false,Apply request rate limit.
+limit_req_dry_run,"http,server,location",on | off,false,false,Do not actually limit—only log decisions.
+limit_req_log_level,"http,server,location",info | notice | warn | error,false,false,Log level for limiting events.
+limit_req_status,"http,server,location",<code>,false,false,HTTP status for rejected requests.
+limit_conn_zone,http,$key zone=<name>:<size>,false,false,Define shared zone to limit simultaneous connections.
+limit_conn,"http,server,location",<zone> <number>,false,false,Apply per-key concurrent connection limit.
+limit_conn_log_level,"http,server,location",info | notice | warn | error,false,false,Log level for connection limiting.
+limit_conn_status,"http,server,location",<code>,false,false,HTTP status for rejected connections.
+ssl_certificate,"http,server",<path>,false,false,Path to server certificate (PEM).
+ssl_certificate_key,"http,server",<path>,false,false,Path to private key (PEM).
+ssl_protocols,"http,server",TLSv1 TLSv1.1 TLSv1.2 TLSv1.3,false,false,Allowed TLS protocol versions.
+ssl_ciphers,"http,server",<ciphers>,false,false,Cipher suites string.
+ssl_prefer_server_ciphers,"http,server",on | off,false,false,Prefer server ciphers over client preference.
+ssl_session_cache,"http,server",off | none | builtin:<n> | shared:<name>:<size>,false,false,Enable TLS session caching.
+ssl_session_timeout,"http,server",<time>,false,false,Timeout for TLS session cache entries.
+ssl_session_tickets,"http,server",on | off,false,false,Enable TLS session tickets.
+ssl_dhparam,"http,server",<path>,false,false,Diffie-Hellman parameters for DHE ciphers.
+ssl_ecdh_curve,"http,server",auto | <curve> ...,false,false,Elliptic curves for ECDHE.
+ssl_trusted_certificate,"http,server",<path>,false,false,CA bundle used for OCSP stapling and verification.
+ssl_stapling,"http,server",on | off,false,false,Enable OCSP stapling.
+ssl_stapling_verify,"http,server",on | off,false,false,Verify stapled OCSP response.
+ssl_verify_client,"http,server",on | off | optional | optional_no_ca,false,false,Request client certificate.
+ssl_verify_depth,"http,server",<number>,false,false,Max verification depth for client certs.
+add_header,"http,server,location",<name> <value> [always],false,false,Add header to response.
+add_trailer,"http,server,location",<name> <value>,false,false,Add trailer header to response.
+etag,"http,server,location",on | off,false,false,Control ETag generation.
+expires,"http,server,location",off | epoch | max | <time> | @<time>,false,false,Set Cache-Control and Expires for responses.
+limit_rate,"http,server,location",<rate>,false,false,Limit per-connection response rate.
+limit_rate_after,"http,server,location",<size>,false,false,Start limiting only after sending the given size.
+chunked_transfer_encoding,"http,server,location",on | off,false,false,Enable/disable chunked transfer encoding.
+autoindex,"http,server,location",on | off,false,false,Enable directory listings.
+autoindex_exact_size,"http,server,location",on | off,false,false,Show file sizes exactly or rounded.
+autoindex_localtime,"http,server,location",on | off,false,false,Use local time in listings.
+autoindex_format,"http,server,location",html | xml | json | jsonp,false,false,Autoindex output format.
+max_ranges,"http,server,location",0 | <number> | unlimited,false,false,Limit number of accepted ranges in Range header.
+random_index,"http,server,location",on | off,false,false,Randomly choose index file from directory.
+fastcgi_pass,"location,if in location",<upstream>|unix:<path>,false,false,Pass requests to FastCGI server.
+fastcgi_param,"http,server,location",<name> <value> [if_not_empty],false,false,Set FastCGI parameter.
+fastcgi_index,"http,server,location",<file>,false,false,Default file name for index with FastCGI.
+fastcgi_connect_timeout,"http,server,location",<time>,false,false,Timeout for connecting to FastCGI.
+fastcgi_send_timeout,"http,server,location",<time>,false,false,Timeout for sending to FastCGI.
+fastcgi_read_timeout,"http,server,location",<time>,false,false,Timeout for reading from FastCGI.
+fastcgi_buffers,"http,server,location",<n> <size>,false,false,Number and size of buffers for FastCGI responses.
+fastcgi_buffer_size,"http,server,location",<size>,false,false,Size of the buffer for the first part of response from FastCGI.
+fastcgi_busy_buffers_size,"http,server,location",<size>,false,false,Size of buffers in busy state for FastCGI.
+fastcgi_temp_path,http,<path> [level1 [level2 [level3]]],false,false,Directory for temporary FastCGI files.
+fastcgi_cache,"http,server,location",off | <zone>,false,false,Enable named cache zone for FastCGI responses.
+fastcgi_cache_path,http,<path> keys_zone=<name>:<size> [inactive=<time>] [levels=...] ...,false,false,Define cache storage and parameters for FastCGI.
+fastcgi_cache_key,"http,server,location",<string>,false,false,Key used to store cached FastCGI responses.
+fastcgi_cache_valid,"http,server,location",<code> <time> | any <time>,false,false,Default cache time by response code for FastCGI.
+fastcgi_cache_bypass,"http,server,location",<condition> ...,false,false,Conditions to bypass FastCGI cache.
+fastcgi_no_cache,"http,server,location",<condition> ...,false,false,Conditions that prevent saving to FastCGI cache.
+fastcgi_cache_lock,"http,server,location",on | off,false,false,Serialize cache updates for same key (FastCGI).
+fastcgi_cache_use_stale,"http,server,location",error | timeout | http_500 | updating | ...,false,false,Serve stale FastCGI content on specified problems.
+fastcgi_keep_conn,"http,server,location",on | off,false,false,Keep FastCGI connections alive.
+uwsgi_pass,"location,if in location",<upstream>|unix:<path>,false,false,Pass requests to uWSGI server.
+uwsgi_param,"http,server,location",<name> <value> [if_not_empty],false,false,Set uWSGI parameter.
+uwsgi_connect_timeout,"http,server,location",<time>,false,false,Timeout for connecting to uWSGI.
+uwsgi_send_timeout,"http,server,location",<time>,false,false,Timeout for sending to uWSGI.
+uwsgi_read_timeout,"http,server,location",<time>,false,false,Timeout for reading from uWSGI.
+uwsgi_buffers,"http,server,location",<n> <size>,false,false,Number and size of buffers for uWSGI responses.
+uwsgi_buffer_size,"http,server,location",<size>,false,false,Size of the buffer for the first part of response from uWSGI.
+uwsgi_busy_buffers_size,"http,server,location",<size>,false,false,Size of buffers in busy state for uWSGI.
+uwsgi_temp_path,http,<path> [level1 [level2 [level3]]],false,false,Directory for temporary uWSGI files.
+uwsgi_cache,"http,server,location",off | <zone>,false,false,Enable named cache zone for uWSGI responses.
+uwsgi_cache_path,http,<path> keys_zone=<name>:<size> [inactive=<time>] [levels=...] ...,false,false,Define cache storage and parameters for uWSGI.
+uwsgi_cache_key,"http,server,location",<string>,false,false,Key used to store cached uWSGI responses.
+uwsgi_cache_valid,"http,server,location",<code> <time> | any <time>,false,false,Default cache time by response code for uWSGI.
+uwsgi_cache_bypass,"http,server,location",<condition> ...,false,false,Conditions to bypass uWSGI cache.
+uwsgi_no_cache,"http,server,location",<condition> ...,false,false,Conditions that prevent saving to uWSGI cache.
+uwsgi_cache_lock,"http,server,location",on | off,false,false,Serialize cache updates for same key (uWSGI).
+uwsgi_cache_use_stale,"http,server,location",error | timeout | http_500 | updating | ...,false,false,Serve stale uWSGI content on specified problems.
+uwsgi_modifier1,"http,server,location",<number>,false,false,Set the uwsgi modifier1 value.
+uwsgi_modifier2,"http,server,location",<number>,false,false,Set the uwsgi modifier2 value.
+scgi_pass,"location,if in location",<upstream>|unix:<path>,false,false,Pass requests to SCGI server.
+scgi_param,"http,server,location",<name> <value> [if_not_empty],false,false,Set SCGI parameter.
+scgi_connect_timeout,"http,server,location",<time>,false,false,Timeout for connecting to SCGI.
+scgi_send_timeout,"http,server,location",<time>,false,false,Timeout for sending to SCGI.
+scgi_read_timeout,"http,server,location",<time>,false,false,Timeout for reading from SCGI.
+scgi_buffers,"http,server,location",<n> <size>,false,false,Number and size of buffers for SCGI responses.
+scgi_buffer_size,"http,server,location",<size>,false,false,Size of the buffer for the first part of response from SCGI.
+scgi_busy_buffers_size,"http,server,location",<size>,false,false,Size of buffers in busy state for SCGI.
+scgi_temp_path,http,<path> [level1 [level2 [level3]]],false,false,Directory for temporary SCGI files.
+scgi_cache,"http,server,location",off | <zone>,false,false,Enable named cache zone for SCGI responses.
+scgi_cache_path,http,<path> keys_zone=<name>:<size> [inactive=<time>] [levels=...] ...,false,false,Define cache storage and parameters for SCGI.
+scgi_cache_key,"http,server,location",<string>,false,false,Key used to store cached SCGI responses.
+scgi_cache_valid,"http,server,location",<code> <time> | any <time>,false,false,Default cache time by response code for SCGI.
+scgi_cache_bypass,"http,server,location",<condition> ...,false,false,Conditions to bypass SCGI cache.
+scgi_no_cache,"http,server,location",<condition> ...,false,false,Conditions that prevent saving to SCGI cache.
+scgi_cache_lock,"http,server,location",on | off,false,false,Serialize cache updates for same key (SCGI).
+scgi_cache_use_stale,"http,server,location",error | timeout | http_500 | updating | ...,false,false,Serve stale SCGI content on specified problems.
+grpc_pass,"location,if in location",grpc://<upstream> | grpcs://<upstream>,false,false,Pass requests to gRPC upstream.
+grpc_set_header,"http,server,location",<header> <value>,false,false,Set/override header passed to gRPC upstream.
+grpc_connect_timeout,"http,server,location",<time>,false,false,Timeout for connecting to gRPC upstream.
+grpc_send_timeout,"http,server,location",<time>,false,false,Timeout for sending to gRPC upstream.
+grpc_read_timeout,"http,server,location",<time>,false,false,Timeout for reading from gRPC upstream.
+grpc_next_upstream,"http,server,location",error | timeout | ... | off,false,false,Conditions to pass request to next gRPC upstream.
+grpc_next_upstream_tries,"http,server,location",<number>,false,false,Limit number of next_upstream attempts (gRPC).
+grpc_ssl_name,"http,server,location",<name>,false,false,Override SNI server name for gRPC.
+grpc_ssl_verify,"http,server,location",on | off,false,false,Verify upstream certificate for gRPC.
+grpc_ssl_trusted_certificate,"http,server,location",<path>,false,false,CA bundle for gRPC upstream verification.
+real_ip_header,"http,server,location",X-Real-IP | X-Forwarded-For | proxy_protocol | <header>,false,false,Header to use for the client address.
+set_real_ip_from,"http,server,location",<address>|<CIDR>,false,false,Trusted addresses that can set real IP.
+real_ip_recursive,"http,server,location",on | off,false,false,Use recursive search in X-Forwarded-For.
+auth_request,"http,server,location",off | <uri>,false,false,Subrequest to an auth endpoint that must return 2xx/401/403.
+auth_request_set,"http,server,location",$var <value>,false,false,Set variable from auth subrequest response.
+auth_request_pass_client_body,"http,server,location",on | off,false,false,Pass client request body to auth subrequest.
+auth_request_buffer_size,"http,server,location",<size>,false,false,Buffer size for reading auth subrequest response.
+sub_filter,"http,server,location",<regex|string> <replacement>,true,false,Replace response content (string or regex).
+sub_filter_once,"http,server,location",on | off,false,false,"If 'on', replace only first match per response."
+sub_filter_last_modified,"http,server,location",on | off,false,false,Set Last-Modified header for filtered responses.
+sub_filter_types,"http,server,location",mime/type ...,false,false,Applicable MIME types for sub_filter.
+charset,"http,server,location",<charset> | off,false,false,Set response charset.
+charset_types,"http,server,location",mime/type ...,false,false,Apply charset only to these MIME types.
+source_charset,"http,server,location",<charset>,false,false,Charset of proxied/fastcgi/etc. upstream if different.
+charset_map,http,<from> <to> { ... },false,true,Define character conversion map.
+add_before_body,"http,server,location",<uri>,false,false,Add the contents of a file before response body.
+add_after_body,"http,server,location",<uri>,false,false,Add the contents of a file after response body.
+mirror,"http,server,location",off | <uri>,false,false,Mirror the original request to the specified URI.
+mirror_request_body,"http,server,location",on | off,false,false,Mirror with/without the request body.
+image_filter,"http,server,location",off | test | size | rotate <angle> | resize <w> <h> | crop <w> <h>,false,false,Transform images on the fly.
+image_filter_buffer,"http,server,location",<size>,false,false,Buffer size for image filter module.
+image_filter_interlace,"http,server,location",on | off,false,false,Enable interlaced PNG/JPEG.
+image_filter_jpeg_quality,"http,server,location",1..100,false,false,Set JPEG quality for image filter.
+image_filter_sharpen,"http,server,location",on | off | <value>,false,false,Sharpen image.
+ssi,"http,server,location",on | off,false,false,Enable Server Side Includes.
+ssi_silent_errors,"http,server,location",on | off,false,false,Do not log SSI errors.
+ssi_types,"http,server,location",mime/type ...,false,false,MIME types that will be processed by SSI.
+ssi_min_file_chunk,"http,server,location",<size>,false,false,Minimum chunk size to read files for SSI.
+ssi_value_length,"http,server,location",<number>,false,false,Maximum length of SSI variable values.
+stub_status,location,,false,false,Enable NGINX basic status page in location.
+stream,main,,false,true,Stream (TCP/UDP) context block.
+resolver,"http,server,stream,mail",<address> ... [valid=<time>] [ipv6=on|off],false,false,Name servers for DNS resolution.
+resolver_timeout,"http,server,stream,mail",<time>,false,false,DNS resolution timeout.
+proxy_pass,"stream,server",<address>[:port] | <upstream>,false,false,Pass TCP/UDP to upstream (stream module).
+proxy_timeout,"stream,server",<time>,false,false,Timeout between two successive read/writes to upstream.
+proxy_connect_timeout,"stream,server",<time>,false,false,Timeout for connecting to upstream server.
+proxy_protocol,"stream,server,listen",on | off,false,false,Enable PROXY protocol for proxied connections.
+listen,"stream,server",[ip]:port [udp] [ssl] [proxy_protocol],false,false,Address/port for stream server.
+preread_buffer_size,"stream,server",<size>,false,false,Buffer size for preread phase in stream.
+preread_timeout,"stream,server",<time>,false,false,Timeout for preread phase in stream.
+js_preread,"stream,server",<function>,false,false,Run njs function during preread phase (njs module).
+mail,main,,false,true,Mail proxy context block.
+auth_http,mail,<url>,false,false,External HTTP authentication service for mail.
+starttls,mail,on | off | only,false,false,Control TLS for mail protocols.
+xclient,mail,on | off,false,false,Support XCLIENT for SMTP.
+smtp_auth,mail,login | plain | cram-md5 | external | none,false,false,SMTP authentication methods.
+imap_capabilities,mail,string ...,false,false,Advertised IMAP capabilities.
+pop3_capabilities,mail,string ...,false,false,Advertised POP3 capabilities.
+proxy_pass_error_message,mail,on | off,false,false,Pass upstream error message to client.
