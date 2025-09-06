@@ -1,4 +1,4 @@
-name,contexts,possible_values,support_regex,is_block_directive,description
+name,contexts,possible_values,does_support_regex,is_block_directive,description
 user,main,<user> [group],false,false,User and optional group for worker processes.
 worker_processes,main,auto | <number>,false,false,Number of worker processes.
 pid,main,<path>,false,false,Path to PID file.

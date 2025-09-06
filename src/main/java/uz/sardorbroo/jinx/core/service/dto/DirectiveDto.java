@@ -1,4 +1,4 @@
-package uz.sardorbroo.jinx.core.content.pojo;
+package uz.sardorbroo.jinx.core.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Directive {
+public class DirectiveDto {
 
     private String name;
 

@@ -1,10 +1,10 @@
 package uz.sardorbroo.jinx.core.content;
 
-import uz.sardorbroo.jinx.core.content.pojo.Context;
+import uz.sardorbroo.jinx.core.service.dto.ContextDto;
 
 import java.io.InputStream;
 
 public interface ContentLoader {
 
-    Context load(InputStream is);
+    ContextDto load(InputStream is);
 }

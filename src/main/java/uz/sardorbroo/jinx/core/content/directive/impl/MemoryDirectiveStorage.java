@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uz.sardorbroo.jinx.core.content.directive.DirectiveStorage;
 
@@ -14,6 +15,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "application.directive-storage", name = "impl", havingValue = "memory")
 public class MemoryDirectiveStorage implements DirectiveStorage {
 
     public static final Map<String, Directive> DIRECTIVES = getDirectives();
@@ -34,7 +36,7 @@ public class MemoryDirectiveStorage implements DirectiveStorage {
     public static Map<String, Directive> getDirectives() {
 
         Map<String, Directive> directives = new HashMap<>();
-        String path = "src/main/resources/config/db/init-data/nginx_directives_extended.csv";
+        String path = "src/main/resources/config/db/init-data/nginx_directives.csv";
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 
             boolean header = true;

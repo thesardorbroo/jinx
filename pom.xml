@@ -28,6 +28,7 @@
 		<spring-boot-starter-mongodb.version>3.4.1</spring-boot-starter-mongodb.version>
 		<mongodb-java-driver.version>3.12.14</mongodb-java-driver.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
+		<mongobee.version>0.13</mongobee.version>
 	</properties>
 
 	<dependencies>
@@ -36,15 +37,15 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.github.mongobee</groupId>
+            <artifactId>mongobee</artifactId>
+            <version>${mongobee.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 			<version>${spring-boot-starter-mongodb.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>${mongodb-java-driver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>

@@ -1,6 +1,5 @@
 package uz.sardorbroo.jinx.core.content.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uz.sardorbroo.jinx.core.content.ContentLoader;
 import uz.sardorbroo.jinx.core.content.directive.DirectiveStorage;
-import uz.sardorbroo.jinx.core.content.pojo.BlockDirective;
-import uz.sardorbroo.jinx.core.content.pojo.Context;
-import uz.sardorbroo.jinx.core.content.pojo.Directive;
+import uz.sardorbroo.jinx.core.service.dto.BlockDirectiveDto;
+import uz.sardorbroo.jinx.core.service.dto.ContextDto;
+import uz.sardorbroo.jinx.core.service.dto.DirectiveDto;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -18,6 +17,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 
 @Slf4j
 @Service
@@ -25,20 +25,17 @@ import java.util.Objects;
 public class ConfContentLoader implements ContentLoader {
 
     private final DirectiveStorage storage;
-    private final ObjectMapper mapper;
 
-    // contexts
-    private Context previous;
-    private Context current;
+    private final Stack<ContextDto> contexts = new Stack<>();
 
     @Override
     @SneakyThrows
-    public Context load(InputStream is) {
+    public ContextDto load(InputStream is) {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        Context main = new Context();
+        ContextDto main = new ContextDto();
         main.setName("main");
-        this.current = main;
+        this.contexts.push(main);
 
         while (reader.ready()) {
 
@@ -46,7 +43,7 @@ public class ConfContentLoader implements ContentLoader {
             load(line);
         }
 
-        return main;
+        return this.contexts.pop();
     }
 
     private void load(String line) {
@@ -63,15 +60,14 @@ public class ConfContentLoader implements ContentLoader {
 
                 String name = elements[0];
                 if (Objects.equals("}", name)) {
-                    this.current = this.previous;
-                    this.previous = null;
+                    this.contexts.pop();
                 }
 
                 if (StringUtils.isBlank(name) || !storage.supported(name)) {
                     return;
                 }
 
-                Directive directive = new Directive();
+                DirectiveDto directive = new DirectiveDto();
                 List<String> values = new ArrayList<>();
 
                 for (int i = 1; i < elements.length; i++) {
@@ -81,27 +77,21 @@ public class ConfContentLoader implements ContentLoader {
 
                     if (arg.startsWith("{")) {
 
-                        Context context = new Context();
+                        ContextDto context = new ContextDto();
                         context.setName(name);
 
-                        BlockDirective block = new BlockDirective();
+                        BlockDirectiveDto block = new BlockDirectiveDto();
                         block.setName(name);
                         block.setValues(values);
 
-                        this.current.addDirective(block);
-                        this.current.addContext(context);
-
-                        this.previous = this.current;
-                        this.current = context;
+                        this.contexts.peek().addContext(context);
+                        this.contexts.push(context);
 
                         break;
 
                     } else if (arg.endsWith("}")) {
 
-                        this.current = this.previous;
-                        this.previous = null;
-
-                        // break;
+                        this.contexts.pop();
 
                     } else if (arg.endsWith(";")) {
                         arg = arg.substring(0, arg.lastIndexOf(";"));
@@ -113,8 +103,8 @@ public class ConfContentLoader implements ContentLoader {
                 directive.setName(name);
                 directive.setValues(values);
 
-                if (Objects.nonNull(name)) {
-                    this.current.addDirective(directive);
+                if (StringUtils.isNotBlank(name)) {
+                    this.contexts.lastElement().addDirective(directive);
                 }
             }
         }

@@ -3,7 +3,6 @@ package uz.sardorbroo.jinx.core.service.domain;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import uz.sardorbroo.jinx.core.content.pojo.Context;
 
 /**
  * NginxConf stores content of Nginx config files
@@ -30,7 +29,6 @@ public class NginxConf {
      */
     private String path;
 
-    // todo relation to Block entities
     /**
      * Content of nginx config file.
      * Content of file stores here.

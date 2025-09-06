@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.sardorbroo.jinx.core.content.pojo.Context;
+import uz.sardorbroo.jinx.core.service.dto.ContextDto;
 
 @Data
 @Builder
@@ -18,5 +18,5 @@ public class PackageNode {
 
     private String path;
 
-    private Context context;
+    private ContextDto context;
 }

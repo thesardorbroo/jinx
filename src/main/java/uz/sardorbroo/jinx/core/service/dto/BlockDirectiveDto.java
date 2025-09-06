@@ -1,4 +1,4 @@
-package uz.sardorbroo.jinx.core.content.pojo;
+package uz.sardorbroo.jinx.core.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BlockDirective extends Directive {
+public class BlockDirectiveDto extends DirectiveDto {
 
-    private List<Directive> directives;
+    private List<DirectiveDto> directives;
 }

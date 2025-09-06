@@ -18,5 +18,8 @@ spring:
       uri: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
 
 application:
+  directive-storage:
+    impl: mongodb
+    init: src/main/resources/config/db/init-data/nginx_directives.csv
   features:
     package-scan: true

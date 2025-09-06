@@ -1,17 +1,16 @@
 package uz.sardorbroo.jinx.core.file.resolver.impl;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.SneakyThrows;
 import uz.sardorbroo.jinx.core.content.ContentLoader;
 import uz.sardorbroo.jinx.core.content.directive.impl.MemoryDirectiveStorage;
 import uz.sardorbroo.jinx.core.content.impl.ConfContentLoader;
-import uz.sardorbroo.jinx.core.content.pojo.Context;
 import uz.sardorbroo.jinx.core.file.enumeration.FileType;
 import uz.sardorbroo.jinx.core.file.pojo.DirectoryNode;
 import uz.sardorbroo.jinx.core.file.pojo.FileNode;
 import uz.sardorbroo.jinx.core.file.pojo.PackageNode;
-import uz.sardorbroo.jinx.core.file.resolver.FileResolver;
+import uz.sardorbroo.jinx.core.file.resolver.FileTypeResolver;
 import uz.sardorbroo.jinx.core.file.resolver.NodeResolver;
+import uz.sardorbroo.jinx.core.service.dto.ContextDto;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +22,7 @@ public class SimpleNodeResolver implements NodeResolver {
 
     private final FileConverter fileConverter = new FileConverter();
 
-    private final FileResolver resolver = new SimpleFileResolver();
+    private final FileTypeResolver resolver = new SimpleFileTypeResolver();
 
     public PackageNode resolve(File file) {
 
@@ -56,7 +55,7 @@ public class SimpleNodeResolver implements NodeResolver {
 
     private class FileConverter implements Converter {
 
-        private final ContentLoader loader = new ConfContentLoader(new MemoryDirectiveStorage(), new JsonMapper());
+        private final ContentLoader loader = new ConfContentLoader(new MemoryDirectiveStorage());
 
         @SneakyThrows
         @Override
@@ -72,7 +71,7 @@ public class SimpleNodeResolver implements NodeResolver {
             type.getSetter().accept(node);
 
             if (Objects.equals(FileType.CONF, type)) {
-                Context context = loader.load(new FileInputStream(file));
+                ContextDto context = loader.load(new FileInputStream(file));
                 node.setContext(context);
             }
 

@@ -1,0 +1,23 @@
+version: '3.8'
+name: jinx
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgresql-db
+    environment:
+      POSTGRES_USER: jinx
+      POSTGRES_DB: jinx
+      POSTGRES_PASSWORD:
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    image: dpage/pgadmin4:9.8
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "5433:80" # Expose pgAdmin web interface to host
+    depends_on:
+      - postgres
