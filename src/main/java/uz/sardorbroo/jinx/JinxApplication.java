@@ -43,14 +43,14 @@ public class JinxApplication {
         log.info(
                 CRLFLogConverter.CRLF_SAFE_MARKER,
                 """
-    
-                    ----------------------------------------------------------
-                    \tApplication '{}' is running! Access URLs:
-                    \tLocal: \t\t{}://localhost:{}{}
-                    \tExternal: \t{}://{}:{}{}
-                    \tSwagger UI: {}://localhost:{}{}
-                    \tProfile(s): \t{}
-                    ----------------------------------------------------------""",
+                        
+                        ----------------------------------------------------------
+                        \tApplication '{}' is running! Access URLs:
+                        \tLocal: \t\t{}://localhost:{}{}
+                        \tExternal: \t{}://{}:{}{}
+                        \tSwagger UI: {}://localhost:{}{}
+                        \tProfile(s): \t{}
+                        ----------------------------------------------------------""",
                 applicationName,
                 protocol, serverPort, contextPath,
                 protocol, hostAddress, serverPort, contextPath,

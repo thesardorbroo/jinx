@@ -1,7 +1,8 @@
 logging:
   level:
-    root: INFO
+    root: DEBUG
     uz.sardorbroo.jinx: DEBUG
+    org.liquibase: DEBUG
 
 server:
   port: 8080
@@ -12,10 +13,18 @@ nginx:
 spring:
   application:
     name: jinx
+  liquibase:
+    enabled: true
+    change-log: classpath:config/db/master.xml
+    url: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
   # Uncomment if you want to enable MongoDB in your project
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/jinx?authSource=admin
+
+mongock:
+  migration-scan-package:
+    - uz.sardorbroo.jinx.config.changelog.mongock
 
 application:
   directive-storage:

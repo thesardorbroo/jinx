@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <property name="sardorbroo" value="Shorahimov Sardor"/>
+
+    <include file="config/db/changelogs/202509060200_init_all_nginx_directives_specifications.xml" relativeToChangelogFile="false"/>
+
+</databaseChangeLog>

@@ -1,0 +1,101 @@
+// seed-nginx-directives.mongo
+// DB: jinx, Collection: nginx_directives
+// CSV: resources/config/db/init-data/nginx-directives.csv
+const fs = require('fs');
+const path = require('path');
+
+const DB_NAME = 'jinx';
+const COLL = 'nginx_directives';
+const CSV_PATH = path.join(process.cwd(), 'resources', 'config', 'db', 'init-data', 'nginx-directives.csv');
+
+function log(msg) { print(`[seed] ${msg}`); }
+
+function normalizeKey(h) {
+  return String(h || '')
+    .trim().toLowerCase()
+    .replace(/\s+/g, '_').replace(/[^\w]/g, '_')
+    .replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+}
+
+function parseScalar(value) {
+  if (value === undefined) return null;
+  const s = String(value).trim();
+  if (s === '') return null;
+  if (/^(true|false)$/i.test(s)) return /^true$/i.test(s);
+  if (/^null$/i.test(s)) return null;
+  const n = Number(s);
+  if (!Number.isNaN(n) && /^[+-]?\d+(\.\d+)?$/.test(s)) return n;
+  return s;
+}
+
+function parseCsvLine(line, delimiter = ',') {
+  const out = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === delimiter && !inQuotes) {
+      out.push(cur); cur = '';
+    } else cur += ch;
+  }
+  out.push(cur);
+  return out.map(v => v.trim());
+}
+
+// --- Start ---
+log(`PWD: ${process.cwd()}`);
+log(`CSV PATH: ${CSV_PATH}`);
+
+if (!fs.existsSync(CSV_PATH)) {
+  throw new Error(`[seed] CSV not found: ${CSV_PATH}`);
+}
+
+const raw = fs.readFileSync(CSV_PATH, 'utf8').replace(/\r\n/g, '\n');
+const lines = raw.split('\n').filter(l => l.trim().length > 0);
+if (lines.length < 2) { log('CSV has no data rows (only header). Exiting.'); quit(0); }
+
+const headers = parseCsvLine(lines[0], ',');
+const keys = headers.map(normalizeKey);
+
+const docs = [];
+for (let i = 1; i < lines.length; i++) {
+  const cols = parseCsvLine(lines[i], ',');
+  if (!cols.length || cols.every(c => c.trim() === '')) continue;
+  const doc = {};
+  for (let c = 0; c < keys.length; c++) doc[keys[c] || `col_${c}`] = parseScalar(cols[c]);
+  docs.push(doc);
+}
+log(`Parsed rows: ${docs.length}`);
+
+const jinx = db.getSiblingDB(DB_NAME);
+log(`Target DB: ${jinx.getName()}`);
+
+const existing = jinx.getCollectionNames();
+if (!existing.includes(COLL)) {
+  jinx.createCollection(COLL);
+  log(`Collection created: ${COLL}`);
+} else {
+  log(`Collection exists: ${COLL}`);
+}
+
+// Создадим (неуникальный) индекс по одному из ключевых полей, если есть
+const candidateKeys = ['name', 'directive', 'nazvanie_direktiva'];
+const idxKey = candidateKeys.find(k => docs.length && Object.prototype.hasOwnProperty.call(docs[0], k));
+if (idxKey) {
+  try {
+    jinx.getCollection(COLL).createIndex({ [idxKey]: 1 }, { name: `${idxKey}_1`, unique: false });
+    log(`Index ensured: ${idxKey}_1`);
+  } catch (e) { log(`Index creation warning: ${e}`); }
+}
+
+if (docs.length > 0) {
+  const res = jinx.getCollection(COLL).insertMany(docs, { ordered: false });
+  log(`Inserted: ${res.insertedIds ? Object.keys(res.insertedIds).length : docs.length}`);
+} else {
+  log('No documents to insert.');
+}
+
+log('Done.');
